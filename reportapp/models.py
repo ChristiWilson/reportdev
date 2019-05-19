@@ -8,13 +8,6 @@ class LawABC(models.Model):
     class Meta:
         abstract = True
 
-# class BodyABC(models.Model):
-#     title = models.CharField(max_length=100, blank=True)
-#     body_text = models.CharField(max_length=3750)
-#
-#     class Meta:
-#         abstract = True
-
 
 class FedStatute(LawABC):
     case_law_id = models.CharField(max_length=10)
@@ -34,11 +27,6 @@ class ReportCase(LawABC):
     plaintiff = models.CharField(max_length=50)
     defendant = models.CharField(max_length=50)
     tried = models.BooleanField(default=False)
-    # charge = models.ForeignKey(
-    #         Charge,
-    #         related_name="charge",
-    #         related_query_name="charges",
-    #         on_delete=models.CASCADE)
     counts = models.PositiveSmallIntegerField(default=1)
     court = models.CharField(max_length=50)
     num_convictions = models.PositiveSmallIntegerField(default=0)
@@ -77,6 +65,7 @@ class Charge(models.Model):
 
 
 class Footnote(models.Model):
+
     VOLUME1 = "VOL1"
     VOLUME2 = "VOL2"
     QUESTIONS = "QUES"
@@ -87,11 +76,6 @@ class Footnote(models.Model):
             (QUESTIONS, "Questions"),
             ]
 
-    # report = models.ForeignKey(
-    #         Report,
-    #         on_delete=models.CASCADE,
-    #         related_name="section",
-    #         related_query_name="sections")
     section = models.CharField(max_length=4, choices=SECTION)
     footnote_number = models.PositiveSmallIntegerField()
     text = models.TextField(max_length=2000)
@@ -110,6 +94,7 @@ class Footnote(models.Model):
 
 
 class Report(models.Model):
+
     VOLUME_I = "VI"
     VOLUME_II = "VII"
     APPENDIX_A = "APA"
@@ -171,17 +156,6 @@ class Report(models.Model):
             max_length=100,
             help_text="This is what is bold at beginning of the section."
             )
-    # body = models.ForeignKey(
-    #         Body,
-    #         on_delete=models.CASCADE,
-    #         related_query_name="bodies",
-    #         related_name="body")
-    # footnote = models.ForeignKey(
-    #         Footnote,
-    #         on_delete=models.CASCADE,
-    #         related_name="footnote",
-    #         related_query_name="footnotes"
-    #         )
     page_number = models.PositiveSmallIntegerField(help_text="This is the actual page in the report")
     adobe_page = models.PositiveSmallIntegerField(blank=True, help_text="What is the adobe page?")
     slug = models.SlugField(max_length=100, null=True, blank=True)
@@ -204,7 +178,6 @@ class Body(models.Model):
             verbose_name="the related section of the report",
             related_name="report",
             related_query_name="reports",
-
             )
     title = models.CharField(
             max_length=100,
@@ -214,47 +187,58 @@ class Body(models.Model):
             help_text="Only enter a paragraph at a time."
             )
 
-    # body_id = models.ForeignKey(
-    #         "self",
-    #         on_delete=models.CASCADE,
-    #         related_query_name="body_id",
-    #         related_name="bodies_ids")
-
     class Meta:
         db_table = "body"
 
     def __str__(self):
         return str(self.title)
 
-# class Report(models.Model):
-#     section = models.ForeignKey(
-#             Section,
-#             on_delete=models.CASCADE,
-#             related_query_name="sections",
-#             related_name="section"
-#             )
-#     page_number = models.PositiveSmallIntegerField()
-#     adobe_page = models.PositiveSmallIntegerField()
-#
-#     class Meta:
-#         db_table = "report"
-#
-#     def __str__(self):
-#         return self.section.section.__str__()
+
+class Person(models.Model):
+    firstname = models.CharField(max_length=30)
+    lastname = models.CharField(max_length=30)
+    description = models.TextField()
+    personsid = models.CharField(
+            max_length=10,
+            help_text="This is used for the html id field",
+            blank=True,
+            null=True,
+            )
+    alias = models.CharField(
+            max_length=30,
+            blank=True,
+            null=True)
+
+    class Meta:
+        db_table = "persons"
+
+    def __str__(self):
+        return self.lastname + ", " + self.firstname
 
 
 class Glossary(models.Model):
+
+    ENTITY = "E"
+    ACRONYM = "A"
+
     ABBREVIATIONS = [
-            ("N", "Name"),
-            ("E", "Entity"),
-            ("A", "Acronym"),
+            (ENTITY, "Entity"),
+            (ACRONYM, "Acronym"),
             ]
 
-    abbrev = models.CharField(max_length=1, choices=ABBREVIATIONS)
+    abbrev = models.CharField(max_length=1, choices=ABBREVIATIONS, default=ENTITY)
+    abbrev_text = models.CharField(
+            max_length=20,
+            null=True,
+            blank=True,
+            )
     text = models.TextField()
     glossaryid = models.CharField(
             max_length=10,
-            help_text="This is used in the template id field"
+            help_text="This is used in the template id field",
+            blank=True,
+            null=True,
+            default="#"
             )
 
     def save(self, *args, **kwargs):
@@ -304,32 +288,11 @@ class Question(models.Model):
             blank=True
             )
 
-    # footnote = models.ForeignKey(
-    #         Footnote,
-    #         on_delete=models.CASCADE,
-    #         related_name="question_footnote",
-    #         related_query_name="question_footnotes")
-
     class Meta:
         db_table = "questions"
 
     def __str__(self):
         return self.title
-
-# class Answer(models.Model):
-#     question = models.ForeignKey(
-#             Question,
-#             on_delete=models.CASCADE,
-#             related_query_name="questions",
-#             related_name="question"
-#             )
-#     answer = models.TextField()
-#
-#     class Meta:
-#         db_table = "answers"
-#
-#     def __str__(self):
-#         return self.question.title
 
 
 class QAText(models.Model):
@@ -339,6 +302,7 @@ class QAText(models.Model):
     SUB_QUESTION = "S"
     ANSWER = "A"
     LEVEL2 = "2"
+
     Q_OR_A = [
             (INTRODUCTION, "Introduction"),
             (QUESTION, "Question"),
@@ -354,7 +318,13 @@ class QAText(models.Model):
             related_query_name="questions",
             related_name="question"
             )
+    opt_title = models.CharField(
+            max_length=100,
+            blank=True,
+            help_text="Is this a sub-title"
+            )
     text = models.TextField()
+    page_number = models.PositiveSmallIntegerField(blank=True, default=1)
 
     class Meta:
         db_table = "qa_text"
@@ -362,7 +332,8 @@ class QAText(models.Model):
     def __str__(self):
         return self.qa_choice
 
-# TODO Clean up commented fields in models
 # TODO Create docstring in all Models
 # TODO Add page number to Either QAText or Question Model.
 # TODO Should  There be a "title" text field to QA Text?
+# TODO Add a table for Persons with First name, Last Name and  Description.
+# TODO Add a method (in __str__  or ?) to display "last, first"
