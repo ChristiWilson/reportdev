@@ -3,7 +3,7 @@ from django.db import models
 
 class LawABC(models.Model):
     case = models.CharField(max_length=100)
-    url = models.URLField()
+    url = models.URLField(max_length=100, blank=True)
 
     class Meta:
         abstract = True
@@ -63,6 +63,7 @@ class Charge(models.Model):
     case = models.ForeignKey(
             ReportCase,
             on_delete=models.CASCADE,
+            verbose_name="investigation case",
             related_query_name="report_cases",
             related_name="report_case"
             )
@@ -166,7 +167,10 @@ class Report(models.Model):
             choices=REPORT_SUBSECTION,
             default=MAIN,
             help_text="What level in the report. This is used for the ol type")
-    section_title = models.CharField(max_length=100, help_text="This is what is bold.")
+    section_title = models.CharField(
+            max_length=100,
+            help_text="This is what is bold at beginning of the section."
+            )
     # body = models.ForeignKey(
     #         Body,
     #         on_delete=models.CASCADE,
@@ -180,6 +184,7 @@ class Report(models.Model):
     #         )
     page_number = models.PositiveSmallIntegerField(help_text="This is the actual page in the report")
     adobe_page = models.PositiveSmallIntegerField(blank=True, help_text="What is the adobe page?")
+    slug = models.SlugField(max_length=100, null=True, blank=True)
 
     class Meta:
         db_table = "report"
@@ -196,6 +201,7 @@ class Body(models.Model):
     report = models.ForeignKey(
             Report,
             on_delete=models.CASCADE,
+            verbose_name="the related section of the report",
             related_name="report",
             related_query_name="reports",
 
@@ -292,7 +298,9 @@ class Question(models.Model):
     category = models.CharField(max_length=5, choices=CATEGORY, default=QUESTION)
     title = models.CharField(
             max_length=100,
-            help_text="Explanation Of the Question")
+            help_text="Explanation Of the Question",
+            blank=True
+            )
 
     # footnote = models.ForeignKey(
     #         Footnote,
@@ -335,6 +343,7 @@ class QAText(models.Model):
     question = models.ForeignKey(
             Question,
             on_delete=models.CASCADE,
+            verbose_name="question being asked",
             related_query_name="questions",
             related_name="question"
             )
@@ -347,3 +356,4 @@ class QAText(models.Model):
         return self.qa_choice
 
 # TODO Clean up commented fields in models
+# TODO Create docstring in all Models

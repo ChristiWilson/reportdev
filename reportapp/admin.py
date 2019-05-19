@@ -20,3 +20,5 @@ class QuestionAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Question, QuestionAdmin)
+
+# TODO Create Docstring to document the admin layout.
