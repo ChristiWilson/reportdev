@@ -17,6 +17,9 @@ class QuestionAdmin(admin.ModelAdmin):
                     }
              ),
             ]
+    inlines = [
+            QATextInline,
+            ]
 
 
 admin.site.register(Question, QuestionAdmin)

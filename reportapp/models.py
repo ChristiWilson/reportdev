@@ -288,11 +288,13 @@ class Question(models.Model):
     INTRO = "INTRO"
     QUESTION = "QUES"
     SUB_QUESTION = "SUBQ"
+    LEVELII = "LEV2"
 
     CATEGORY = [
             (INTRO, "Introduction"),
             (QUESTION, "Question"),
-            (SUB_QUESTION, "Sub Question"),
+            (SUB_QUESTION, "Level 1"),
+            (LEVELII, "Level 2"),
             ]
     part = models.CharField(max_length=3, choices=PART, default=PART_I)
     category = models.CharField(max_length=5, choices=CATEGORY, default=QUESTION)
@@ -334,9 +336,14 @@ class QAText(models.Model):
 
     INTRODUCTION = "I"
     QUESTION = "Q"
+    SUB_QUESTION = "S"
     ANSWER = "A"
+    LEVEL2 = "2"
     Q_OR_A = [
+            (INTRODUCTION, "Introduction"),
             (QUESTION, "Question"),
+            (SUB_QUESTION, "Level 1"),
+            (LEVEL2, "Level II"),
             (ANSWER, "Answer"),
             ]
     qa_choice = models.CharField(max_length=1, choices=Q_OR_A)
@@ -357,3 +364,5 @@ class QAText(models.Model):
 
 # TODO Clean up commented fields in models
 # TODO Create docstring in all Models
+# TODO Add page number to Either QAText or Question Model.
+# TODO Should  There be a "title" text field to QA Text?
