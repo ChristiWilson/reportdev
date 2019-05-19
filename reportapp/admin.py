@@ -1,3 +1,22 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import Question, QAText
+
+
+class QATextInline(admin.StackedInline):
+    model = QAText
+    extra = 2
+
+
+class QuestionAdmin(admin.ModelAdmin):
+    fieldsets = [
+            ("Part and Category", {
+                    "fields": (
+                            ("category", "part"), "title",
+                            ),
+                    }
+             ),
+            ]
+
+
+admin.site.register(Question, QuestionAdmin)
