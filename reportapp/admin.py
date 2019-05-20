@@ -12,7 +12,7 @@ class QuestionAdmin(admin.ModelAdmin):
     fieldsets = [
             ("Part and Category", {
                     "fields": (
-                            ("category", "part"), "title",
+                            ("category", "part"), "title", "slug"
                             ),
                     }
              ),
@@ -20,6 +20,8 @@ class QuestionAdmin(admin.ModelAdmin):
     inlines = [
             QATextInline,
             ]
+    prepopulated_fields = {"slug": ("title",)}
+    # autocomplete_fields = {"slug": "title"}
 
 
 admin.site.register(Question, QuestionAdmin)

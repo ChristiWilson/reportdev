@@ -76,9 +76,19 @@ class Footnote(models.Model):
             (QUESTIONS, "Questions"),
             ]
 
-    section = models.CharField(max_length=4, choices=SECTION)
+    section = models.CharField(
+            max_length=4,
+            choices=SECTION,
+            help_text="What section of the report does this footnote belong to?"
+            )
     footnote_number = models.PositiveSmallIntegerField()
     text = models.TextField(max_length=2000)
+    slug = models.SlugField(
+            max_length=5,
+            blank=True,
+            null=True,
+            help_text="This is the footnote number. The url will be volume/footnote",
+            )
     listid = models.CharField(max_length=10)
     page_number = models.PositiveSmallIntegerField(blank=True)
 
@@ -271,12 +281,14 @@ class Question(models.Model):
 
     INTRO = "INTRO"
     QUESTION = "QUES"
+    ABOUT = "ABOUT"
     SUB_QUESTION = "SUBQ"
     LEVELII = "LEV2"
 
     CATEGORY = [
             (INTRO, "Introduction"),
             (QUESTION, "Question"),
+            (ABOUT, "About"),
             (SUB_QUESTION, "Level 1"),
             (LEVELII, "Level 2"),
             ]
@@ -286,6 +298,12 @@ class Question(models.Model):
             max_length=100,
             help_text="Explanation Of the Question",
             blank=True
+            )
+    slug = models.SlugField(
+            max_length=100,
+            null=True,
+            blank=True,
+            help_text="This will be auto-populated from the title field."
             )
 
     class Meta:
@@ -325,6 +343,7 @@ class QAText(models.Model):
             )
     text = models.TextField()
     page_number = models.PositiveSmallIntegerField(blank=True, default=1)
+    adobe_page = models.CharField(max_length=4, blank=True, null=True)
 
     class Meta:
         db_table = "qa_text"
