@@ -1,12 +1,36 @@
-{% extends "reportapp/base.html" %}
+{% extends "base.html" %}
 
 {% block title %}
-    {% block super %}- Appendix C
-    {% endblock %}
-{% endblock title %}
+{% block super %}
+ - Appendix C
+{% endblock %}
+{% endblock %}
+
+{% block header %}
+Appendix C
+{% endblock %}
 
 
+{% block content %}
+
+    {% for q in questions %}
+        {% if q.part == "INT" %}
+            <h1>{{ q.title }}</h1>
+            {% for qt in questexts %}
+                {% if qt.qa_choice == "I" %}
+                    <p>{{ qt.text|safe }}</p>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        {% if q.part == "I"%}
+            {% for qt in questexts %}
+            <ol type="I" >
+                <li><b>{{ q.title }}</b></li>
+            </ol>
+                {% endfor %}
 
 
+        {% endif %}
 
-
+    {% endfor %}
+{% endblock %}
