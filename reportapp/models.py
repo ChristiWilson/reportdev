@@ -356,3 +356,6 @@ class QAText(models.Model):
 # TODO Should  There be a "title" text field to QA Text?
 # TODO Add a table for Persons with First name, Last Name and  Description.
 # TODO Add a method (in __str__  or ?) to display "last, first"
+# TODO need to find a way to do nested sections in models.
+# TODO OPTION 1: Should I do a recursive relationship with models?
+# TODO OPTION 2: Should I do a hierarchical model design?
