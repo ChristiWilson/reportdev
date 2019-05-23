@@ -127,7 +127,7 @@ class Report(models.Model):
     CONCLUSION = "C"
 
     REPORT_CHOICES = [
-            (INTRO, "Into"),
+            (INTRO, "Introduction"),
             (EXECUTIVE, "Executive Summary"),
             (SECTION, "Section"),
             (CONCLUSION, "Conclusion"),
@@ -349,7 +349,53 @@ class QAText(models.Model):
         db_table = "qa_text"
 
     def __str__(self):
-        return self.qa_choice
+         return self.qa_choice
+
+ class Para(models.Model):
+     INTRODUCTION = "I"
+     QUESTION = "Q"
+     SUB_QUESTION = "S"
+     ANSWER = "A"
+     LEVEL2 = "2"
+
+     Q_OR_A = [
+             (INTRODUCTION, "Introduction"),
+             (QUESTION, "Question"),
+             (SUB_QUESTION, "Level 1"),
+             (LEVEL2, "Level II"),
+             (ANSWER, "Answer"),
+             ]
+     qa_choice = models.CharField(max_length=1, choices=Q_OR_A)
+     ques = models.ForeignKey(
+             Ques,
+             on_delete=models.CASCADE,
+             verbose_name="question being asked",
+             )
+     opt_title = models.CharField(
+             max_length=100,
+             blank=True,
+             help_text="Is this a sub-title"
+             )
+     level = models.ForeignKey(
+             "self",
+             on_delete=models.CASCADE,
+             related_name="sub_level",
+             verbose_name="sub section of question",
+             null=True,
+             )
+     text = models.TextField()
+     page_number = models.PositiveSmallIntegerField(blank=True, default=1)
+     adobe_page = models.CharField(max_length=4, blank=True, null=True)
+
+     class Meta:
+         db_table = "para_text"
+
+     def __str__(self):
+         return self.qa_choice
+
+
+# TODO Refactor both question/ques/qatext and para models for selection choices.
+# TODO (con't) that are not, nor will ever, be used.
 
 # TODO Create docstring in all Models
 # TODO Add page number to Either QAText or Question Model.
@@ -359,3 +405,5 @@ class QAText(models.Model):
 # TODO need to find a way to do nested sections in models.
 # TODO OPTION 1: Should I do a recursive relationship with models?
 # TODO OPTION 2: Should I do a hierarchical model design?
+
+
