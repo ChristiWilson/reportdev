@@ -1,5 +1,5 @@
 from django.db import models
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django import forms
 
 # Following a YouTube Video for creating nested comments
@@ -28,6 +28,12 @@ class Comment(models.Model):
     body = models.TextField()
     parent = models.ForeignKey("self", on_delete=models.CASCADE, null=True, blank=True, related_name="reply")
 
+    class Meta:
+        ordering = ["id"]  # unsure if this is how I want to order or if ordering is needed.
+
+    def __str__(self):
+        return "{}".format(self.body)
+
 
 # I am going to be doing the data entry in the admin interface, just adding
 # these fields to follow along as I am not going to running the code right now
@@ -46,13 +52,44 @@ class CommentForm(forms.ModelForm):
 # in views.py
 def blog_view(request):
     posts = Blog.objects.all()
-    return render(request,"reportapp/home.html", {"posts": posts})
+    return render(request, "reportapp/home.html", {"posts": posts})
 
 
 def blog_details(request, slug):
     post = get_object_or_404(Blog, slug=slug)
-    return render(request, "reportapp/home.html", {"blog": post})
+    comments = post.comments.filter(parent__isnull=True)
+
+    if request.method == "POST":
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid():
+            try:
+                parent_id = int(request.POST.get("parent_id"))
+            except KeyError:
+                parent_id = None
+            if parent_id:
+                parent_obj = Comment.objects.get(id=parent_id)
+                if parent_obj:
+                    reply_comment = comment_form.save(commit=False)
+                    reply_comment.parent = parent_obj
+            new_comment = comment_form.save(commit=False)
+            new_comment.post = post
+            new_comment.save()
+            return redirect("blog:detail", slug)
+    return render(request, "reportapp/home.html", {"blog": post, "comments": comments, })
+
+# The following is for html.
 
 
-def comment_view(request,):
-    pass
+"""
+{% for comment in comments %}
+    <p>{{ comment.name }} </p>
+        {{ comment.body|linebreaks}}
+        
+        {% for reply in comment.replies.all %}
+            <p>{{ reply.name }}</p>
+                {{ reply.body|linebreaks }}            
+        {% endfor %}
+        
+{% endfor %}
+    
+"""
